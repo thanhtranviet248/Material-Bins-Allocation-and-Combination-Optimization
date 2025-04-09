@@ -10,9 +10,9 @@ This project is where I use Gurobi solver on Python environment to optimize the 
 - Objective 2: After allocation, there may be leftover inventory in some bins. If the leftover quantity in a bin is less than 1,000 units, it should be combined with other bins to reduce warehouse fragmentation. A model should be built to automatically identify and consolidate such bins, aiming to minimize the total number of bins used while respecting the bin capacity constraint.
 
 ## Solving process
-- Step 1: Build a MILP optimization model to address objective 1 of the problem.
-- Step 2: After obtaining the bins and materials allocation result, perform data manipulation to compare the allocated amount versus stock on-hand to check the left-over inventory in each bin.
-- Step 3: Build another MILP optimization model to address objective 2 of the problem.
+- Step 1: Build a MILP optimization model to address objective 1.
+- Step 2: Compare the allocated materials amount versus stock on-hand to check the left-over inventory in each bin.
+- Step 3: Build another MILP optimization model to address objective 2.
 - Step 4: Export the result to Excel for operation.
 
 # Objective 1
