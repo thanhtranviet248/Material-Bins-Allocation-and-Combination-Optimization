@@ -7,7 +7,7 @@ This project is where I use Gurobi solver on Python environment to address the m
 - In the warehouse, materials are stored in bins (bin 1, bin 2, ...) with a capacity of 3,000 units each.
 - Each bin can only store one type of material, but the same material can be stored across multiple bins. For instance, bin 1 holds 2,001 units of A1, bin 2 stores 2,155 units of A1, and bin 28 contains 2,504 units of A10.
 - Objective 1: Develop a model to automatically assign bins and the corresponding quantities of materials to production orders. The model should fulfill all material requirements while minimizing the number of bins allocated and ensuring available stock is not exceeded.
-- Objective 2: After allocation, there may be leftover inventory in some bins. If an amount of material from a bin is allocated to any production orders and the left-over inventory in that bin is less than 1,000 units, it should be combined with other bins to reduce warehouse fragmentation. A model should be built to automatically identify and consolidate such bins, aiming to minimize the total number of bins used while respecting the bin capacity constraint.
+- Objective 2: After allocation, there may be leftover inventory in some bins. If an amount of materials from a bin is allocated to any production orders and the left-over inventory in that bin is less than 1,000 units, it should be combined with other bins to reduce warehouse fragmentation. A model should be built to automatically identify and consolidate such bins, aiming to minimize the total number of bins used while respecting the bin capacity constraint.
 
 ## Solving process
 - Step 1: Build a MILP optimization model to address objective 1.
