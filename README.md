@@ -16,7 +16,6 @@ This project is where I use Gurobi solver on Python environment to optimize the 
 - Step 4: Export the result to Excel for operation.
 
 # Objective 1
-
 ## Mathematical model
 ### Sets
 - I is the set of the factory workforce, $I = \{1, 2, 3, \dots, 20\}$
