@@ -1,5 +1,5 @@
 # Material Bins Allocation and Combination Optimization
-This project is where I use Gurobi solver on Python environment to optimize the material bins allocation and combination problem for a manufacturer.
+This project is where I use Gurobi solver on Python environment to address the material bins allocation and combination problem for a manufacturer.
 
 ## Problem statement
 - At the factory, we receive multiple production orders (PO1, PO2, ...) from customers.
