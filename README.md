@@ -31,7 +31,7 @@ This project is where I use Gurobi solver on Python environment to optimize the 
 - $d_{ij}$ is the demand of production order i for material j
 - $s_{jk}$ is the supply of material j at bin k
 
-### Decision variable
+### Decision variables
 - $x_{ijk}$ is the amount of material j from bin k to be allocated to production order i, $x_{ijk} \in N$
 - $y_{ijk}$ is the decision whether to allocate material j from bin k to production order i or not, $y_{ijk} = \{0, 1\}$
 
@@ -41,6 +41,6 @@ This project is where I use Gurobi solver on Python environment to optimize the 
 - Linking constraint: For each production order i, item j and bin k, if any amount of item j in bin k is allocated to production order i (y_{ijk} > 0), the corresponding decision variable x_{ijk} must be equal to 1: $x_{ijk} - s_{jk} * y_{ijk} \leq 0, \forall i in I, \forall j \in J, \forall k \in K$
 
 ### Objective function
-- Minimizing the total workforce assigned: $\min \sum_{i=1}^{20} \sum_{j=1}^{7} \sum_{k=1}^{3} x_{ijk}$
+- Minimizing the number of bins allocated: $\min \sum_{i=1}^{I} \sum_{j=1}^{J} \sum_{k=1}^{K} x_{ijk}$
 
 
