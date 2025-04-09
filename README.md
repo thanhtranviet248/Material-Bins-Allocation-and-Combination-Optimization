@@ -18,7 +18,7 @@ This project is where I use Gurobi solver on Python environment to optimize the 
 # Objective 1
 ## Mathematical model
 ### Sets
-- I is the set of the factory workforce, $I = \{1, 2, 3, \dots, 20\}$
+- I is the set of factory production orders, $I = \{PO1, PO2, PO3, \dots\}$
 - J is the set of weekday, $J = \{1, 2, 3, \dots, 7\}$
 - K is the set of each shift in a day, $K = \{1, 2, 3\}$
 
