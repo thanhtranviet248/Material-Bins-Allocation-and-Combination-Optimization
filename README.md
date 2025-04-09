@@ -19,20 +19,26 @@ This project is where I use Gurobi solver on Python environment to optimize the 
 ## Mathematical model
 ### Sets
 - I is the set of factory production orders, $I = \{PO1, PO2, PO3, \dots\}$
-- J is the set of weekday, $J = \{1, 2, 3, \dots, 7\}$
-- K is the set of each shift in a day, $K = \{1, 2, 3\}$
+- J is the set of materials, $J = \{A1, A2, A3, \dots}$
+- K is the set of bins, $K = \{1, 2, 3, \dots}$
+- D is the set of demand (material requirements of production orders)
+- S is the set of supply (stock on-hand of bins)
 
 ### Parameters
-- $D_{jk}$ is the labor demand in day j at shift k
+- i is the index of a production order, $\forall i \in I$
+- j is the index of a material, $\forall j \in J$
+- k is the index of a bin, $\forall k \in K$
+- $d_{ij}$ is the demand of production order i for material j
+- $s_{jk}$ is the supply of material j at bin k
 
 ### Decision variable
-- $x_{ijk}$ is the binary decision variable on assigning labor i to day j at shift k, $x_{ijk} = \{0, 1\}$
+- $x_{ijk}$ is the amount of material j from bin k to be allocated to production order i, $x_{ijk} \in N$
+- $y_{ijk}$ is the decision whether to allocate material j from bin k to production order i or not, $y_{ijk} = \{0, 1\}$
 
 ### Constraints
-- For each shift k in each day j, the number of labor to be assigned must fulfill the demand: $\sum_{i=1}^{20} x_{ijk} = D_{jk}, \forall k \in K, \forall j \in J$
-- For each labor i in each day j, the maximum number of shift he/she can work is 1: $\sum_{k=1}^{3} x_{ijk} \leq 1, \forall i \in I, \forall j \in J$
-- For each labor i, the maximum day and shift he/she can work is 5: $\sum_{j=1}^{7} \sum_{k=1}^{3} x_{ijk} \leq 5, \forall i \in I$
-- For each labor i in each 2 days j and j+1, if he/she works on evening shift (k = 3) today, he/she cannot work on the morning shift (k = 1) tomorrow: $x_{ij3} + x_{i(j+1)1} = 1, \forall j \in J, \forall j+1 \in J$
+- Demand constraint: For each production order i and material j, the total amount of materials to be allocated from all bins k must satisfy the demand: $\sum_{k=1}^{K} x_{ijk} = d_{ij}, \forall i \in I, \forall j \in J$
+- Supply constraint: For each material j and bin k, the total amount of materials to be allocated to all production orders i must not exceed the stock on-hand level: $\sum_{i=1}^{I} x_{ijk} \leq s_{jk}, \forall j \in J, \forall k \in K$
+- Linking constraint: For each production order i, item j and bin k, if any amount of item j in bin k is allocated to production order i (y_{ijk} > 0), the corresponding decision variable x_{ijk} must be equal to 1: $x_{ijk} - s_{jk} * y_{ijk} \leq 0, \forall i in I, \forall j \in J, \forall k \in K$
 
 ### Objective function
 - Minimizing the total workforce assigned: $\min \sum_{i=1}^{20} \sum_{j=1}^{7} \sum_{k=1}^{3} x_{ijk}$
