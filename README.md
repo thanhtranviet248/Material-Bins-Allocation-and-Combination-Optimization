@@ -38,7 +38,7 @@ This repository is where I use Gurobi solver on Python environment to address th
 ### Constraints
 - Demand constraint: For each production order i and material j, the total amount of materials to be allocated from all bins k must satisfy the demand: $\sum_{k=1}^{K} x_{ijk} = d_{ij}, \forall i \in I, \forall j \in J$
 - Supply constraint: For each material j and bin k, the total amount of materials to be allocated to all production orders i must not exceed the stock on-hand level: $\sum_{i=1}^{I} x_{ijk} \leq s_{jk}, \forall j \in J, \forall k \in K$
-- Linking constraint: For each production order i, item j and bin k, if any amount of item j in bin k is allocated to production order i (y_{ijk} > 0), the corresponding decision variable x_{ijk} must be equal to 1: $x_{ijk} - s_{jk} * y_{ijk} \leq 0, \forall i in I, \forall j \in J, \forall k \in K$
+- Linking constraint: For each production order i, item j and bin k, if any amount of item j in bin k is allocated to production order i ($y_{ijk} > 0$), the corresponding decision variable $x_{ijk}$ must be equal to 1: $x_{ijk} - s_{jk} * y_{ijk} \leq 0, \forall i in I, \forall j \in J, \forall k \in K$
 
 ### Objective function
 - Minimizing the number of bins allocated: $\min \sum_{i=1}^{I} \sum_{j=1}^{J} \sum_{k=1}^{K} x_{ijk}$
