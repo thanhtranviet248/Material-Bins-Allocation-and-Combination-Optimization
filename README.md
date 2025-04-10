@@ -63,8 +63,9 @@ For each material, we have:
 - $b_{n}$ is the decision whether to use destination bin or not, $b_{n} = \{0, 1\}$
 
 ### Constraints
-- Only-one combination constraint: For each origin bin, it can only be combined with maximum one destination bin: $\sum_{n=1}^{O} b_{n} \leq 1, \forall m \in M$
-- Bin capacity constraint: For each destination bin n, if it is used, the total amount of materials to be allocated from all origin bins to it must not exceed its storing capacity: $\sum_{m=1}^{M} a_{mn} \cdot q_{mn} \leq c_{n} \cdot b_{n}, \forall n \in N$
+- One-destination constraint: For each orgin bin m, it must be allocate to only one destination bin n: $\sum_{n=1}^{N} a_{mn} = 1, \forall m \in M$
+- Storing capacity constraint: For each destination bin n, if it is used, the total amount of materials to be allocated from all origin bins m to it must not exceed its storing capacity: $\sum_{m=1}^{M} a_{mn} \cdot q_{mn} \leq c_{n} \cdot b_{n}, \forall n \in N$
+- Linking constraint: For each origin bin m and destination bin n, if the origin bin m is combined with the destination bin n, the corresponding decision variable $b_{n}$ must be equal to 1, else 0: $a_{mn} - n_{n} \leq 0, \forall m \in M, \forall n \in N$
 
 ### Objective function
 - Minimizing the number of bins after combination: $\min \sum_{n=1}^{N} b_{n}$
