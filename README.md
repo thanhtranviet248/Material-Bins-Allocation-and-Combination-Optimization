@@ -2,7 +2,7 @@
 This repository is where I use Gurobi solver on Python environment to address the material bins allocation and combination problem for a Vietnamese manufacturer.
 
 ## Problem statement
-- At the factory, we receive multiple production orders (PO1, PO2, ...) from customers.
+- The factory receives multiple production orders (PO1, PO2, ...) from customers.
 - Each production order requires specific quantities of materials. For example, order PO1 might need 14,219 units of material A57, 12,220 units of material A1, and 7,582 units of material A7.
 - In the warehouse, materials are stored in bins (bin 1, bin 2, ...) with a capacity of 3,000 units each.
 - Each bin can only store one type of material, but the same material can be stored across multiple bins. For instance, bin 1 holds 2,001 units of A1, bin 2 stores 2,155 units of A1, and bin 28 contains 2,504 units of A10.
