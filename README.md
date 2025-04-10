@@ -43,7 +43,7 @@ This repository is where I use Gurobi solver on Python environment to address th
 ### Objective function
 - Minimizing the number of bins allocated: $\min \sum_{i=1}^{I} \sum_{j=1}^{J} \sum_{k=1}^{K} x_{ijk}$
 
-# Pronlem 2: Minimizing the number of bins after combination
+# Problem 2: Minimizing the number of bins after combination
 ## Mathematical model
 For each material, we have:
 ### Sets
