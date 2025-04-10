@@ -47,13 +47,14 @@ This repository is where I use Gurobi solver on Python environment to address th
 ## Mathematical model
 For each material, we have:
 ### Sets
-- O is the number of origin bins after bins and materials allocation
+- M is the number of origin bins
+- N is the number of destination bins
 - Q is the left-over inventory of bins
 - C is the capacity of bins
 
 ### Parameters
-- m is the index of a origin bin (before combination), $\forall m \in O$
-- n is the index of a destination bin (after combination), $\forall n \in O$
+- m is the index of a origin bin, $\forall m \in O$
+- n is the index of a destination bin, $\forall n \in O$
 - $q_{m}$ is the left-over inventory of origin bin m, $\forall m \in O$
 - $c_{n}$ is the storing capacity of destination bin n, $\forall n \in O$
 
