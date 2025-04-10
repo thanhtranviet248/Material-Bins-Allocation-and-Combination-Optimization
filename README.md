@@ -15,7 +15,7 @@ This repository is where I use Gurobi solver on Python environment to address th
 - Step 3: Build another MILP optimization model to address problem 2.
 - Step 4: Export the result to Excel for operation.
 
-# Objective 1: Minimizing the number of bins allocated
+# Problem 1: Minimizing the number of bins allocated
 ## Mathematical model
 ### Sets
 - I is the set of factory production orders, $I = \{PO1, PO2, PO3, \dots\}$
@@ -43,7 +43,7 @@ This repository is where I use Gurobi solver on Python environment to address th
 ### Objective function
 - Minimizing the number of bins allocated: $\min \sum_{i=1}^{I} \sum_{j=1}^{J} \sum_{k=1}^{K} x_{ijk}$
 
-# Objective 2: Minimizing the number of bins after combination
+# Pronlem 2: Minimizing the number of bins after combination
 ## Mathematical model
 For each material, we have:
 ### Sets
