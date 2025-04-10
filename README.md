@@ -59,7 +59,7 @@ For each material, we have:
 
 ### Decision variables
 - $a_{mn}$ is the decision whether to combine bin m to bin n or not, $a_{mn} = \{0, 1\}$
-- $b_{n}$ is the decision whether use destination bin or not, $b_{n} = \{0, 1\}$
+- $b_{n}$ is the decision whether to use destination bin or not, $b_{n} = \{0, 1\}$
 
 ### Constraints
 - Only-one combination constraint: For each origin bin, it can only be combined with maximum one destination bin: $\sum_{n=1}^{O} b_{mn} \leq 1, \forall m \in O$
