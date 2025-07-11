@@ -41,7 +41,7 @@ This repository is where I use Gurobi solver on Python environment to address th
 - Linking constraint: For each production order i, item j and bin k, if any amount of item j in bin k is allocated to production order i ($x_{ijk} > 0$), the corresponding decision variable $y_{ijk}$ must be equal to 1: $x_{ijk} - s_{jk} \cdot y_{ijk} \leq 0, \forall i \in I, \forall j \in J, \forall k \in K$
 
 ### Objective function
-- Minimizing the number of bins allocated: $\min \sum_{i=1}^{I} \sum_{j=1}^{J} \sum_{k=1}^{K} x_{ijk}$
+- Minimizing the number of bins allocated: $\min \sum_{i=1}^{I} \sum_{j=1}^{J} \sum_{k=1}^{K} y_{ijk}$
 
 # Problem 2: Minimizing the number of bins after combination
 ## Mathematical model
