@@ -228,7 +228,7 @@ def test_real_data_end_to_end(real_run):
     k = real_run.kpis()
     assert k["orders_rejected"] == 0
     assert k["pick_stage_not_proven_optimal"] == 0
-    assert k["pick_lines"] == 151            # same optimum as Gurobi on the original model
+    assert k["pick_lines"] == 151
     assert k["fragments_remaining"] <= 3
     assert (real_run.allocation.summary["demand"] == real_run.allocation.summary["allocated"]).all()
 
