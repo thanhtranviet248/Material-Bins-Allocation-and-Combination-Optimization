@@ -228,7 +228,7 @@ def test_real_data_end_to_end(real_run):
     k = real_run.kpis()
     assert k["orders_rejected"] == 0
     assert k["pick_stage_not_proven_optimal"] == 0
-    assert k["pick_lines"] == 151            # same optimum as Gurobi on the original model
+    assert k["pick_lines"] == 151
     assert k["fragments_remaining"] <= 3
     assert (real_run.allocation.summary["demand"] == real_run.allocation.summary["allocated"]).all()
 
@@ -237,6 +237,6 @@ def test_excel_export(real_run, tmp_path):
     out = tmp_path / "out.xlsx"
     export_excel(real_run, out)
     sheets = pd.read_excel(out, sheet_name=None)
-    assert {"summary", "bin_allocation_decision", "bin_combination_decision", "bin_status"} <= set(sheets)
+    assert {"summary", "bin_allocation_decision", "bin_consolidation_decision", "bin_status"} <= set(sheets)
     assert len(sheets["bin_allocation_decision"]) == real_run.kpis()["pick_lines"]
-    assert (sheets["bin_combination_decision"]["quantity_moved"] > 0).all()   # no 0-quantity rows
+    assert (sheets["bin_consolidation_decision"]["quantity_moved"] > 0).all()   # no 0-quantity rows
