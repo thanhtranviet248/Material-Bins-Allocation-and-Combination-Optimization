@@ -237,6 +237,6 @@ def test_excel_export(real_run, tmp_path):
     out = tmp_path / "out.xlsx"
     export_excel(real_run, out)
     sheets = pd.read_excel(out, sheet_name=None)
-    assert {"summary", "bin_allocation_decision", "bin_combination_decision", "bin_status"} <= set(sheets)
+    assert {"summary", "bin_allocation_decision", "bin_consolidation_decision", "bin_status"} <= set(sheets)
     assert len(sheets["bin_allocation_decision"]) == real_run.kpis()["pick_lines"]
-    assert (sheets["bin_combination_decision"]["quantity_moved"] > 0).all()   # no 0-quantity rows
+    assert (sheets["bin_consolidation_decision"]["quantity_moved"] > 0).all()   # no 0-quantity rows

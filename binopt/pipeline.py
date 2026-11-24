@@ -72,9 +72,9 @@ def export_excel(result: PipelineResult, path: str | Path) -> None:
     with pd.ExcelWriter(path, engine="openpyxl") as writer:
         kpi.to_excel(writer, sheet_name="summary", index=False)
         alloc_view.to_excel(writer, sheet_name="bin_allocation_decision", index=False)
-        result.consolidation.moves.to_excel(writer, sheet_name="bin_combination_decision", index=False)
+        result.consolidation.moves.to_excel(writer, sheet_name="bin_consolidation_decision", index=False)
         touched.to_excel(writer, sheet_name="bin_status", index=False)
         result.allocation.summary.to_excel(writer, sheet_name="allocation_by_item", index=False)
-        result.consolidation.summary.to_excel(writer, sheet_name="combination_by_item", index=False)
+        result.consolidation.summary.to_excel(writer, sheet_name="consolidation_by_item", index=False)
         result.stock_check.to_excel(writer, sheet_name="stock_check", index=False)
         result.rejected_orders.to_excel(writer, sheet_name="rejected_orders", index=False)
