@@ -1,4 +1,4 @@
-# Material Bins Allocation and Combination Optimization
+# Material Bins Allocation and Consolidation Optimization
 
 This project assigns warehouse bins to production orders and then consolidates the small left-overs, for a Vietnamese manufacturer. It uses open-source tools only: **PuLP + HiGHS** (MIT licence), so no Gurobi licence is needed.
 
