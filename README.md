@@ -1,12 +1,12 @@
-# Materials Bins Allocation and Consolidation
+# Material Bin Allocation and Consolidation
 
 Plans two warehouse decisions for a manufacturer:
 
 1. **Allocation**: which bins to pick from for each production order.
-2. **Consolidation**: how to merge the small left-overs afterwards, so that fewer bins stay occupied.
+2. **Consolidation**: how to merge the small leftovers afterwards, so that fewer bins stay occupied.
 
-Both decisions are solved as mixed-integer programs (MILP) with open-source tools:
-**PuLP + HiGHS** (MIT licence).
+Both decisions are solved as mixed-integer linear programs (MILP) with open-source tools:
+**PuLP** (modelling) + **HiGHS** (solver, MIT licence).
 
 ---
 
@@ -47,7 +47,7 @@ Decide how much each production order takes from each bin, so that:
 
 ### Problem 2: consolidation
 
-After allocation, a bin that was picked from and keeps a left-over **below 1,000 units**
+After allocation, a bin that was picked from and keeps a leftover **below 1,000 units**
 is called a *fragment*.
 Fragments are moved into other bins of the same item, to reduce the number of occupied bins.
 
@@ -62,14 +62,17 @@ Business rules:
 
 ### Stock shortage
 
-When the total stock of an item is short, only the orders that can be served **completely** are kept.
+When the total stock of an item is short, orders are served all-or-nothing:
+only orders that can be served **completely** are kept, chosen by [order selection](#0-order-selection).
+The other orders are reported as rejected.
 
 ---
 
 ## Approach
 
-A bin holds one item only, so the problem separates by item.
-Every model below is a small MILP **per item**.
+A bin holds one item only, so allocation and consolidation separate by item:
+Problems 1 and 2 are solved as one small MILP **per item**.
+Order selection links the items (an order needs several items), so it is one model over all items.
 
 Each model has several objectives, solved **lexicographically**:
 
@@ -79,24 +82,29 @@ Each model has several objectives, solved **lexicographically**:
 
 ### 0. Order selection
 
-Only used when the total stock is short.
+Only used when the total stock of at least one item is short; otherwise every order is kept.
 
-Choose orders with $u_i \in \{0,1\}$ such that, for every item $j$:
+Data: orders $i \in I$ with priority $p_i$, items $j \in J$,
+demand $d_{ij}$ of order $i$ for item $j$, bins $K_j$ of item $j$ with stock $s_k$.
+
+Choose orders with $u_i \in \{0,1\}$ ($u_i = 1$: order $i$ is served) such that
 
 $$
-\sum_i d_{ij}\ u_i \le\ \sum_k s_{jk}
+\sum_{i \in I} d_{ij}\, u_i \;\le\; \sum_{k \in K_j} s_k \qquad \forall j \in J.
 $$
 
 Objectives, in order:
 
-1. maximize total priority;
-2. maximize total quantity served.
+1. $\max \sum_{i \in I} p_i\, u_i$: **total priority**.
+2. $\max \sum_{i \in I} \sum_{j \in J} d_{ij}\, u_i$: **total quantity served**.
 
 An order is served completely or not at all.
+Total stock per item is enough to guarantee that Problem 1 stays feasible, because a bin may be shared by several orders.
 
 ### Problem 1: allocation
 
-Data for item $j$: orders $I_j$ with demand $d_i$, bins $K_j$ with stock $s_k$, fragment threshold $T$.
+Data for item $j$: orders $I_j$ with demand $d_i$ (of order $i$ for item $j$),
+bins $K_j$ with stock $s_k > 0$, fragment threshold $T$.
 
 | Variable | Meaning |
 |---|---|
@@ -106,74 +114,81 @@ Data for item $j$: orders $I_j$ with demand $d_i$, bins $K_j$ with stock $s_k$, 
 | $e_k \in \{0,1\}$ | bin $k$ is emptied |
 | $f_k \in \{0,1\}$ | bin $k$ becomes a fragment |
 
-Constraints, with left-over $r_k = s_k - \sum_i x_{ik}$:
+Constraints, with leftover $r_k = s_k - \sum_{i \in I_j} x_{ik}$:
 
 $$
 \begin{aligned}
-\sum_k x_{ik} &= d_i && \text{demand met exactly} \\
-x_{ik} &\le \min(s_k, d_i)\, y_{ik} && \text{pick only on an open line} \\
-y_{ik} &\le z_k && \text{a line touches its bin} \\
-r_k &\ge 0 && \text{stock respected} \\
-r_k &\le s_k\,(1 - e_k) && \text{emptied bin has nothing left} \\
-r_k &\ge T\,(z_k - e_k - f_k) && \text{small left-over} \Rightarrow \text{fragment}
+\sum_{k \in K_j} x_{ik} &= d_i && \forall i \in I_j && \text{demand met exactly} \
+x_{ik} &\le \min(s_k, d_i)\, y_{ik} && \forall i \in I_j,\ k \in K_j && \text{pick only on an open line} \
+y_{ik} &\le z_k && \forall i \in I_j,\ k \in K_j && \text{a line touches its bin} \
+r_k &\ge 0 && \forall k \in K_j && \text{stock respected} \
+r_k &\le s_k\, (1 - e_k) && \forall k \in K_j && \text{emptied bin has nothing left} \
+r_k &\ge T\, (z_k - e_k - f_k) && \forall k \in K_j && \text{small leftover} \Rightarrow \text{fragment} \
+e_k \le z_k, \quad f_k &\le z_k && \forall k \in K_j && \text{only a touched bin is emptied or a fragment}
 \end{aligned}
 $$
 
 Objectives, in order:
 
-1. $\min \sum y_{ik}$: **pick lines**.
-2. $\min \sum f_k$: **fragments created**.
-   Among plans with the same number of pick lines, the one that leaves fewer small left-overs is preferred.
-3. $\min \sum z_k$: **bins opened**.
+1. $\min \sum_{i \in I_j} \sum_{k \in K_j} y_{ik}$: **pick lines**.
+2. $\min \sum_{k \in K_j} f_k$: **fragments created**.
+   Among plans with the same number of pick lines, the one that leaves fewer small leftovers is preferred.
+3. $\min \sum_{k \in K_j} z_k$: **bins opened**.
 
 ### Problem 2: consolidation
 
-Data for item $j$: left-over $r_k$ after allocation, capacity $C_k$.
+Data for item $j$: leftover $r_k$ after allocation, capacity $C_k$, threshold $T$.
 
 | Symbol | Meaning |
 |---|---|
 | $O$ | fragments: touched bins with $0 < r_k < T$ |
-| $R$ | possible receivers: every bin of the item with $r_k > 0$ |
-| $w_m \in \{0,1\}$ | fragment $m$ is emptied completely |
-| $a_{mn} \in \{0,1\}$ | route $m \to n$ ($n \ne m$) is used: one forklift move |
-| $q_{mn} \in \mathbb{Z}_+$ | quantity moved on route $m \to n$ |
-| $g_n \in \{0,1\}$ | fragment $n$ stays and is still below $T$ |
-| $S$ | maximum split, `max_split` = 2 |
+| $R$ | possible receivers: every bin of the item with $r_k > 0$ (only $O$ with `--fragments-only-receivers`) |
+| $P$ | possible routes: pairs $(m,n)$ with $m \in O$, $n \in R$, $n \ne m$ and $\min(r_m,\ C_n - r_n) > 0$ |
+| $S$ | maximum split: `max_split` (default 2) |
+| $w_m \in \{0,1\}$ | fragment $m \in O$ is emptied completely |
+| $a_{mn} \in \{0,1\}$ | route $(m,n) \in P$ is used: one forklift move |
+| $q_{mn} \in \mathbb{Z}_+$ | quantity moved on route $(m,n) \in P$ |
+| $g_n \in \{0,1\}$ | fragment $n \in O$ stays and is still below $T$ |
 
-Constraints:
+Constraints (every sum runs over the routes in $P$):
 
 $$
 \begin{aligned}
-\sum_n q_{mn} &= r_m\, w_m && \text{emptied completely, or not moved} \\
-\sum_n a_{mn} &\le S\, w_m && \text{split over at most } S \text{ bins} \\
-a_{mn} \;\le\; q_{mn} &\le \min(r_m,\; C_n - r_n)\, a_{mn} && \text{route link} \\
-r_n + \sum_m q_{mn} &\le C_n && \text{receiver capacity} \\
-a_{mn} + w_n &\le 1 \quad (n \in O) && \text{no chains} \\
-r_n + \sum_m q_{mn} &\ge T\,(1 - w_n - g_n) && \text{marks fragments that remain small}
+\sum_{n} q_{mn} &= r_m\, w_m && \forall m \in O && \text{emptied completely, or not moved} \
+\sum_{n} a_{mn} &\le S\, w_m && \forall m \in O && \text{split over at most } S \text{ bins} \
+a_{mn} \;\le\; q_{mn} &\le \min(r_m,\ C_n - r_n)\, a_{mn} && \forall (m,n) \in P && \text{route link} \
+r_n + \sum_{m} q_{mn} &\le C_n && \forall n \in R && \text{receiver capacity} \
+a_{mn} + w_n &\le 1 && \forall (m,n) \in P,\ n \in O && \text{no chains} \
+r_n + \sum_{m} q_{mn} &\ge T\, (1 - w_n - g_n) && \forall n \in O && \text{marks fragments that remain small}
 \end{aligned}
 $$
 
 Objectives, in order:
 
-1. $\max \sum w_m$: **bins freed**.
-2. $\min \sum g_n$: **fragments remaining**.
-3. $\min \sum a_{mn}$: **forklift moves**.
+1. $\max \sum_{m \in O} w_m$: **bins freed**.
+2. $\min \sum_{n \in O} g_n$: **fragments remaining**.
+3. $\min \sum_{(m,n) \in P} a_{mn}$: **forklift moves**.
    A split is used only when it frees more bins or leaves fewer fragments.
-4. $\min \sum r_m w_m$: **quantity moved**.
+4. $\min \sum_{m \in O} r_m\, w_m$: **quantity moved**.
 
-> **Example.** Three fragments hold 900 units each.
+> **Example.** An item has only three bins, each with capacity 2,000, and each is a fragment holding 900 units
+> (threshold 1,000). The total, 2,700, does not fit in one bin, so at most one bin can be freed.
 >
-> - Moving one whole bin gives 1,800 + 900: one fragment remains.
-> - Splitting it 450 / 450 gives 1,350 + 1,350: one bin is still freed, and no fragment remains.
+> - Moving one whole bin into another gives 1,800 + 900: one bin is freed, but one fragment remains.
+> - Splitting it over the other two, for example 450 / 450, gives 1,350 + 1,350: one bin is still freed,
+>   and no fragment remains. Any split that brings both receivers to at least 1,000 is equally good.
+>
+> Both plans free one bin (objective 1); the split wins on objective 2, although it needs one more move.
 
 ### Validation
 
 `binopt/verify.py` checks every final plan, independently of the models:
 
-- demand is met exactly;
+- demand is met exactly, and every bin is used only for its own item;
 - stock and capacity are respected, and stock is conserved;
+- every move stays within one item, with a positive quantity;
 - there are no chains and no self-moves;
-- every moved fragment is emptied completely and split over at most 2 bins.
+- every moved fragment is emptied completely and split over at most `max_split` bins.
 
 ---
 
@@ -187,14 +202,19 @@ On `input_template.xlsx` (16 production orders):
 | Fragments after allocation | 25 |
 | Moves / quantity moved | 22 / 3,524 |
 | Fragments split | 0 (not needed on this data) |
-| Occupied touched bins, before → after consolidation | 42 → 20 |
+| Occupied bins of the demanded items, before → after consolidation | 42 → 20 |
 | Fragments remaining | 2 (unavoidable \*) |
 | Runtime | about 2.5 min |
 
-\* A58 (952) and A6 (870): the whole remaining stock of each of these items is below 1,000,
+\* Bin 1486 of item A58 (952 units) and bin 1549 of item A6 (870 units):
+the whole remaining stock of each of these items is below 1,000,
 so it ends up in a single bin that is still a fragment.
 
-Every stage of every per-item model finishes with status *Optimal*, and the plan passes validation.
+The plan passes validation.
+The pick-line stage and the bins-opened stage of every item finish with status *Optimal*.
+The fragments-created stage of Problem 1 reaches its 15 s tie-break limit on every item (status *TimeLimit*):
+its plan is feasible, but not proven optimal.
+Every stage of Problem 2 finishes with status *Optimal*.
 
 ---
 
@@ -237,13 +257,15 @@ export_excel(result, "output.xlsx")
 
 | Option | Meaning |
 |---|---|
-| `--capacity` | default bin capacity (3,000) |
-| `--threshold` | fragment threshold (1,000) |
+| `-o`, `--output` | output Excel file (default `output_template.xlsx`) |
+| `--capacity` | bin capacity when the input has no `bin_capacity` column (default 3,000) |
+| `--threshold` | fragment threshold (default 1,000) |
 | `--max-split` | max receiving bins per fragment (default 2; 1 = whole-bin moves only) |
 | `--solver {highs,cbc}` | MILP solver (default HiGHS) |
-| `--time-limit` | time limit in seconds for the primary stage of each model |
+| `--time-limit` | time limit in seconds for the primary stage of each model (default 60) |
 | `--no-fragment-avoidance` | skip the "fragments created" stage of Problem 1 |
 | `--fragments-only-receivers` | fragments may only be merged into other fragments |
+| `-v`, `--verbose` | show the solver log |
 
 ---
 
@@ -267,7 +289,7 @@ An Excel file with these sheets:
 | `summary` | overall KPIs |
 | `bin_allocation_decision` | quantity taken from each bin for each order |
 | `bin_consolidation_decision` | each move: origin, destination, quantity |
-| `bin_status` | bins touched by either step: stock, left-over, final quantity and status |
+| `bin_status` | bins touched by either step: stock, leftover, final quantity and status |
 | `allocation_by_item` | allocation KPIs and solver status per item |
 | `consolidation_by_item` | consolidation KPIs and solver status per item |
 | `stock_check` | demand vs stock per item |
@@ -296,6 +318,9 @@ An Excel file with these sheets:
   - the primary stage of each model has `time_limit` (60 s);
   - each tie-break stage has `tiebreak_time_limit` (15 s).
 - When a stage hits its limit:
-  - if it has a feasible solution, that solution is kept and the stage is reported as `TimeLimit`;
-  - if it finds nothing better, the previous stage's solution is kept and the stage is reported as `NoImprovement`.
+  - if it has a feasible solution, that solution is kept and the stage is reported as `TimeLimit`
+    (feasible, optimality not proven);
+  - if a tie-break stage returns no solution, the previous stage's solution is kept
+    and the stage is reported as `NoImprovement`;
+  - if the primary stage finds no solution at all, the run stops with an error.
 - The KPI `pick_stage_not_proven_optimal` counts the items whose pick-line stage was not proven optimal.
