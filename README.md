@@ -84,7 +84,7 @@ Only used when the total stock is short.
 Choose orders with $u_i \in \{0,1\}$ such that, for every item $j$:
 
 $$
-\sum_i d_{ij}\, u_i \;\le\; \sum_k s_{jk}
+\sum_i d_{ij}\ u_i \le\ \sum_k s_{jk}
 $$
 
 Objectives, in order:
